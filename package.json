@@ -1,0 +1,19 @@
+{
+  "name": "python-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serverless-plugin-warmup": "^8.2.1",
+    "serverless-python-requirements": "^6.0.0"
+  },
+  "devDependencies": {
+    "serverless-offline": "^12.0.4"
+  }
+}

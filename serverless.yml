@@ -1,0 +1,417 @@
+service: serverless-pymongo-item-api
+
+frameworkVersion: "3"
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+  - serverless-plugin-warmup
+
+custom:
+  # functionsBasePath: src
+  pythonRequirements:
+    dockerizePip: non-linux
+  serverless-offline:
+    httpPort: 8000
+  warmup:
+    default:
+      enabled: true
+      folderName: ".warmup"
+      cleanFolder: false
+      memorySize: 256
+      events:
+        - schedule: rate(3 minutes)
+      package:
+        individually: true
+        patterns:
+          - "./*.warmup/**"
+      prewarm: true
+
+provider:
+  name: aws
+  runtime: python3.9
+  memorySize: 512
+  region: us-east-1
+  timeout: 20
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "lambda:InvokeFunction"
+      Resource: "*"
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://finest50-test.vercel.app
+        - http://localhost:3000
+        - https://ipop.ai
+        - https://www.ipop.ai
+        - https://image-editor-lovat.vercel.app
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowCredentials: true
+  # environment:
+  #   MONGO_DB_USER: ${env:MONGO_DB_USER}
+  #   MONGO_DB_PASS: ${env:MONGO_DB_PASS}
+  #   MONGO_DB_NAME: ${env:MONGO_DB_NAME}
+  #   MONGO_DB_URL: ${env:MONGO_DB_URL}
+  #   MONGO_COLLECTION_NAME: ${env:MONGO_COLLECTION_NAME}
+
+  environment:
+    MONGODB_URL: "mongodb+srv://yusuf:yusuf123@cluster0.k7di4af.mongodb.net/?retryWrites=true&w=majority"
+    CLIENT_ID: '499622761902-464crfe2eqqnhlea2rgot9n8ik12cuku.apps.googleusercontent.com'
+    CLIENT_SECRET: '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'
+    ACCESS_TOKEN: 'ya29.a0AWY7CknUbvwlCqfNADN0-RTSfYd0k9VyhX_GIzUyDMjm4qSUF2g2V7oxm0FCcm0KP0sZ5XiPNXGPP2c4DuQ1RvND_0Nlnm-orZ48ei1yHxzIgCx5ifNJ-G_TteDmhcDRb7WqqvvhC5Sl8SoNFNZJ3jb9Kyd0aCgYKAR4SARMSFQG1tDrpOTmjngblDgJz6G3aBjQTQw0163'
+    REFRESH_TOKEN: '1//04cDiFSALbqSvCgYIARAAGAQSNwF-L9Ir5D4HX8akYWcSLrDGB3eI4I4fDZB08MuAXKz5xBtwhvgvC0YjaT_FU20t_uqE8vWjTnY'
+    SCOPES: 'https://www.googleapis.com/auth/gmail.send'
+    BASE_URL: 'https://h5mlr4hpd0.execute-api.us-east-1.amazonaws.com/api'
+    JWT_SECRET_KEY: "JSIOSENFKSDFSJFIS3493"
+    JWT_REFRESH_SECRET_KEY: "IOAKENWKN394883W4O"
+    ALGORITHM: "HS256"
+    AWS_BUCKET: "ipop-images"
+    S3_FOLDER: "products/"
+
+  iam:
+    role:
+      managedPolicies:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+package:
+  individually: true
+  patterns:
+    - "!node_modules/**"
+    - "!package-lock.json"
+    - "!package.json"
+    - "!venv/**"
+    - "!serverless1.yml"
+    - "!registers"
+    - "!src/**"
+    - "!src1"
+    - "!REAMDE.md"
+
+functions:
+  createProduct:
+    warmup:
+      default:
+        enabled: true
+    handler: src.createproduct.createproduct.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/createproduct/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/create-product
+          method: POST
+
+  deleteImage:
+    warmup:
+      default:
+        enabled: true
+    handler: src.deleteimage.deleteimage.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/deleteimage/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/delete-image
+          method: POST
+
+  deleteProduct:
+    warmup:
+      default:
+        enabled: true
+    handler: src.deleteproduct.deleteproduct.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/deleteproduct/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/delete-product/{id}
+          method: DELETE
+
+  forgetPassword:
+    warmup:
+      default:
+        enabled: true
+    handler: src.forgetpassword.forgetpassword.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/forgetpassword/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/forget-password
+          method: POST
+
+  generateImage:
+    warmup:
+      default:
+        enabled: true
+    handler: src.generateimage.generateimage.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/generateimage/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/generate-image
+          method: POST
+
+  getAccount:
+    warmup:
+      default:
+        enabled: true
+    handler: src.getaccount.getaccount.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/getaccount/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/get-account/{id}
+          method: GET
+
+  getProduct:
+    warmup:
+      default:
+        enabled: true
+    handler: src.getproduct.getproduct.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/getproduct/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/get-product/{id}
+          method: GET
+
+  login:
+    warmup:
+      default:
+        enabled: true
+    handler: src.login.login.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/login/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/login
+          method: POST
+
+  negativePrompt:
+    warmup:
+      default:
+        enabled: true
+    handler: src.negativeprompt.negativeprompt.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/negativeprompt/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/negative-prompt
+          method: GET
+
+  register:
+    warmup:
+      default:
+        enabled: true
+    handler: src.register.register.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/register/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/register
+          method: POST
+
+  resetPassword:
+    warmup:
+      default:
+        enabled: true
+    handler: src.resetpassword.resetpassword.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/resetpassword/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/reset-password/{id}
+          method: PUT
+
+  textPrompt:
+    warmup:
+      default:
+        enabled: true
+    handler: src.textprompt.textprompt.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/textprompt/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/text-prompts
+          method: GET
+
+  updateAccount:
+    warmup:
+      default:
+        enabled: true
+    handler: src.updateaccount.updateaccount.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/updateaccount/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/update-account/{id}
+          method: PUT
+
+  updateProduct:
+    warmup:
+      default:
+        enabled: true
+    handler: src.updateproduct.updateproduct.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/updateproduct/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/update-product/{id}
+          method: PUT
+
+  uploadImages:
+    warmup:
+      default:
+        enabled: true
+    handler: src.uploadimages.uploadimages.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/uploadimages/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/upload-images
+          method: POST
+
+  verifyemail:
+    warmup:
+      default:
+        enabled: true
+    handler: src.verifyemail.verifyemail.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/verifyemail/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/verify-email/{id}/{token}
+          method: GET
+
+  verifyForgetPassword:
+    warmup:
+      default:
+        enabled: true
+    handler: src.verifyforgetpasswd.verifyforgetpasswd.lambda_handler
+    # module: src/api
+    package:
+      # exclude:
+      #   - ./**
+      include:
+        - src/verifyforgetpasswd/**
+    layers:
+      - arn:aws:lambda:us-east-1:115174861469:layer:packages:3
+      - arn:aws:lambda:us-east-1:115174861469:layer:util-functions:6
+    events:
+      - httpApi:
+          path: /api/forget-password-verify/{id}/{token}
+          method: PUT
+
+  
+    
